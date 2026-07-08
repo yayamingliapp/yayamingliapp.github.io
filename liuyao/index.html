@@ -52,7 +52,7 @@
   /* phone frame */
   .phone{border:1px solid var(--line); border-radius:22px; overflow:hidden;
     background:#000; box-shadow:0 12px 28px rgba(60,45,25,.16); line-height:0}
-  .phone img{display:block; width:100%}
+  .phone img,.phone video{display:block; width:100%}
 
   /* 排盤 carousel (pure CSS) */
   .pan-demo{max-width:300px; margin:0 auto}
@@ -72,6 +72,36 @@
   .shot .cap{margin-top:.6rem; font-size:.9rem; color:var(--ink-2); letter-spacing:.05em}
   .hl-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1rem}
 
+  /* 版本比較 免費 vs Pro（方案卡） */
+  .plans{display:grid; grid-template-columns:1fr 1fr; gap:1.1rem; align-items:start}
+  .plan{position:relative; background:var(--card); border:1px solid var(--line); border-radius:18px;
+    padding:1.5rem 1.4rem; box-shadow:0 6px 18px rgba(60,45,25,.06)}
+  .plan.pro{border:1.5px solid var(--seal); background:color-mix(in srgb, var(--seal) 6%, var(--card))}
+  .plan-top{display:flex; align-items:center; gap:.75rem; padding-bottom:1rem; margin-bottom:.8rem;
+    border-bottom:1px solid var(--line)}
+  .plan.pro .plan-top{border-bottom-color:color-mix(in srgb, var(--seal) 28%, transparent)}
+  .plan-icon{width:46px; height:46px; border-radius:11px; flex:none; display:flex; align-items:center;
+    justify-content:center; font-family:"Kaiti TC","STKaiti","Songti TC","Noto Serif TC",serif;
+    font-size:22px; background:var(--paper); color:var(--ink-2); border:1px solid var(--line)}
+  .plan.pro .plan-icon{background:var(--seal); color:#fff; border-color:var(--seal)}
+  .plan-icon .crown{width:25px; height:25px; fill:#fff}
+  .plan-name{font-size:1.22rem; font-weight:600; letter-spacing:.05em}
+  .plan.pro .plan-name{color:var(--seal)}
+  .plan-price{font-size:.86rem; color:var(--ink-2); margin-top:.2rem}
+  .plan-price b{color:var(--ink); font-size:1.02rem; font-weight:700; letter-spacing:.02em}
+  .plan-price .old{text-decoration:line-through; opacity:.55; margin-left:.4rem; font-weight:400; font-size:.86rem}
+  .tag{display:inline-block; margin-left:.5rem; padding:.14rem .55rem; border-radius:999px;
+    background:var(--seal); color:#fff; font-size:.66rem; letter-spacing:.12em; vertical-align:middle; font-weight:600}
+  .plan-list{list-style:none; margin:0; padding:0}
+  .plan-list li{display:flex; align-items:flex-start; gap:.6rem; padding:.42rem 0; font-size:.92rem; color:var(--ink)}
+  .plan-list .ic{width:18px; height:18px; flex:none; margin-top:.2rem;
+    fill:none; stroke:var(--water); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round}
+  .plan.pro .plan-list .ic{stroke:var(--seal)}
+  .plan-list b{font-weight:700; color:var(--ink)}
+  .plan.pro .plan-list b{color:var(--seal)}
+  .cmp-note{text-align:center; color:var(--ink-2); font-size:.85rem; margin:1.3rem 0 0; line-height:1.75}
+  .cmp-note b{color:var(--ink); font-weight:600}
+
   footer{margin-top:3.4rem; border-top:1px solid var(--line);
     padding:1.8rem 1.4rem 3rem; text-align:center; color:var(--ink-2); font-size:.9rem}
   footer a{color:var(--link); text-decoration:none; margin:0 .5rem}
@@ -81,6 +111,7 @@
     .shot-grid{grid-template-columns:repeat(2,1fr)}
     .hl-grid{grid-template-columns:repeat(2,1fr)}
     .hero h1{font-size:2rem}
+    .plans{grid-template-columns:1fr; gap:1rem}
   }
 </style>
 </head>
@@ -127,10 +158,10 @@
     <section>
       <div class="sec-head"><h2 class="serif">起卦．四種方式</h2></div>
       <div class="shot-grid">
-        <div class="shot"><div class="phone"><img src="shots/qi_coin.jpg" alt="銅錢起卦"></div><div class="cap">擲銅錢</div></div>
-        <div class="shot"><div class="phone"><img src="shots/qi_dice.jpg" alt="擲骰起卦"></div><div class="cap">擲骰</div></div>
-        <div class="shot"><div class="phone"><img src="shots/qi_number.jpg" alt="報數起卦"></div><div class="cap">報數</div></div>
-        <div class="shot"><div class="phone"><img src="shots/qi_manual.jpg" alt="手動選爻"></div><div class="cap">手動選爻</div></div>
+        <div class="shot"><div class="phone"><video autoplay muted loop playsinline preload="metadata" poster="shots/qi_coin.jpg"><source src="shots/qi_coin.mp4" type="video/mp4"></video></div><div class="cap">擲銅錢</div></div>
+        <div class="shot"><div class="phone"><video autoplay muted loop playsinline preload="metadata" poster="shots/qi_dice.jpg"><source src="shots/qi_dice.mp4" type="video/mp4"></video></div><div class="cap">擲骰</div></div>
+        <div class="shot"><div class="phone"><video autoplay muted loop playsinline preload="metadata" poster="shots/qi_number.jpg"><source src="shots/qi_number.mp4" type="video/mp4"></video></div><div class="cap">報數</div></div>
+        <div class="shot"><div class="phone"><video autoplay muted loop playsinline preload="metadata" poster="shots/qi_manual.jpg"><source src="shots/qi_manual.mp4" type="video/mp4"></video></div><div class="cap">手動選爻</div></div>
       </div>
     </section>
 
@@ -142,6 +173,56 @@
         <div class="shot"><div class="phone"><img src="shots/hl_classic.jpg" alt="古書卦例"></div><div class="cap">古書卦例</div></div>
         <div class="shot"><div class="phone"><img src="shots/hl_teach.jpg" alt="教學"></div><div class="cap">入門教學</div></div>
       </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2 class="serif">免費版 vs Pro</h2><p>免費就很好用，Pro 解鎖無限記錄與完整古書庫</p></div>
+      <div class="plans">
+
+        <div class="plan">
+          <div class="plan-top">
+            <span class="plan-icon">免</span>
+            <div>
+              <div class="plan-name">免費版</div>
+              <div class="plan-price">免費下載</div>
+            </div>
+          </div>
+          <ul class="plan-list">
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>四種起卦・完整排盤</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>三種排盤格式・字體主題</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>入門教學・萬年曆查詢</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>AI 解卦提示詞</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>匯出排盤圖・備份</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>匯入記錄</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>卦記錄 <b>50 筆</b></li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>古書 <b>僅可看部份內容</b></li>
+          </ul>
+        </div>
+
+        <div class="plan pro">
+          <div class="plan-top">
+            <span class="plan-icon">
+              <svg class="crown" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.4 8.2l4.3 3.5L12 4.6l5.3 7.1 4.3-3.5-1.7 9.6a1 1 0 0 1-1 .8H5.1a1 1 0 0 1-1-.8L2.4 8.2z"/></svg>
+            </span>
+            <div>
+              <div class="plan-name">Pro<span class="tag">推薦</span></div>
+              <div class="plan-price">一次買斷 <b>NT$250</b><span class="old">NT$350</span></div>
+            </div>
+          </div>
+          <ul class="plan-list">
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>四種起卦・完整排盤</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>三種排盤格式・字體主題</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>入門教學・萬年曆查詢</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>AI 解卦提示詞</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>匯出排盤圖・備份</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>匯入記錄</li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>卦記錄 <b>無限</b></li>
+            <li><svg class="ic" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 5.5"/></svg>古書 <b>全部・未來新增免費</b></li>
+          </ul>
+        </div>
+
+      </div>
+      <p class="cmp-note"><b>Pro 一次買斷、永久解鎖</b>，購買後未來新增的古書免費更新，不必再付費。</p>
     </section>
   </div>
 
