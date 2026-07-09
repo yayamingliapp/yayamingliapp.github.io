@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<!-- ================================================================
+     鴨鴨六爻 — 記錄轉檔小工具（表單 → JSON）
+     純前端、不連網、資料不外傳；可直接放上 GitHub Pages。
+     欄位對齊 App 匯入格式：主卦 變卦 占日 占時 占者 所問 記錄 標籤
+     ================================================================ -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>記錄轉檔小工具 — 鴨鴨六爻</title>
+<meta name="description" content="填一填，就把卦記錄轉成可匯入鴨鴨六爻的 JSON 檔。資料全在你的裝置上，不上傳。">
+<meta name="theme-color" content="#EFE9DA">
+<style>
+  :root{
+    --paper:#EFE9DA; --card:#FAF6EC; --ink:#26231E; --ink-2:#5C574E;
+    --seal:#9E3B2E; --line:#DDD3BF; --link:#8A3527;
+    --field:#FFFCF4; --chip:#EFE1D2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#17150F; --card:#201D16; --ink:#E7E0D0; --ink-2:#A69E8C;
+      --seal:#D08A7C; --line:#322E24; --link:#E0A18F;
+      --field:#1B1811; --chip:#2C2718;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:-apple-system,"PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+    line-height:1.7; font-size:16px; letter-spacing:.01em;
+  }
+  .serif{font-family:"Kaiti TC","STKaiti","Songti TC","Noto Serif TC",serif}
+  .wrap{max-width:720px; margin:0 auto; padding:2.4rem 1.2rem 3.5rem}
+
+  header{margin-bottom:1.6rem}
+  .brand{display:flex; align-items:center; gap:.7rem; margin-bottom:1.2rem}
+  .seal{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:44px; height:44px; border-radius:7px; background:var(--seal);
+    color:var(--paper); font-size:24px; line-height:1;
+    font-family:"Kaiti TC","STKaiti","Songti TC","Noto Serif TC",serif;
+    flex:none; box-shadow:0 0 0 2px var(--paper) inset;
+  }
+  .brand-name{font-size:1.02rem; font-weight:500; letter-spacing:.05em}
+  h1{font-size:1.85rem; font-weight:600; margin:.2rem 0 .5rem; letter-spacing:.04em}
+  .intro{color:var(--ink-2); margin:.4rem 0 0; font-size:.98rem}
+  .privacy-note{
+    margin-top:1rem; padding:.7rem 1rem; background:var(--card);
+    border:1px solid var(--line); border-radius:10px;
+    font-size:.88rem; color:var(--ink-2);
+  }
+  .privacy-note b{color:var(--seal); font-weight:600}
+
+  .cards{margin-top:1.6rem; display:flex; flex-direction:column; gap:1rem}
+  .card{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:14px; padding:1.1rem 1.1rem 1.2rem;
+  }
+  .card-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:.9rem;
+  }
+  .card-title{font-weight:600; font-size:1.05rem; letter-spacing:.03em}
+  .del{
+    background:none; border:none; color:var(--ink-2); cursor:pointer;
+    font-size:.85rem; padding:.3rem .5rem; border-radius:8px;
+  }
+  .del:hover{color:var(--seal); background:rgba(158,59,46,.08)}
+
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:.8rem}
+  .field{display:flex; flex-direction:column; gap:.32rem}
+  .field.full{grid-column:1 / -1}
+  label{font-size:.82rem; color:var(--ink-2); letter-spacing:.02em}
+  label .req{color:var(--seal)}
+  input, textarea{
+    font-family:inherit; font-size:1rem; color:var(--ink);
+    background:var(--field); border:1px solid var(--line);
+    border-radius:9px; padding:.6rem .7rem; width:100%;
+    -webkit-appearance:none; appearance:none;
+  }
+  input[type="date"], input[type="time"]{min-height:2.6rem}
+  textarea{resize:vertical; min-height:2.6rem; line-height:1.6}
+  input:focus, textarea:focus{
+    outline:none; border-color:var(--seal);
+    box-shadow:0 0 0 3px rgba(158,59,46,.14);
+  }
+  @media (prefers-color-scheme: dark){
+    input:focus, textarea:focus{box-shadow:0 0 0 3px rgba(208,138,124,.18)}
+  }
+
+  /* 標籤 chips */
+  .tags{
+    display:flex; flex-wrap:wrap; gap:.4rem; align-items:center;
+    background:var(--field); border:1px solid var(--line);
+    border-radius:9px; padding:.45rem .5rem; min-height:2.6rem;
+  }
+  .chip{
+    display:inline-flex; align-items:center; gap:.3rem;
+    background:var(--chip); color:var(--ink);
+    border-radius:7px; padding:.2rem .5rem; font-size:.9rem;
+  }
+  .chip button{
+    background:none; border:none; color:var(--ink-2); cursor:pointer;
+    font-size:1rem; line-height:1; padding:0;
+  }
+  .chip button:hover{color:var(--seal)}
+  .tags input{
+    border:none; background:none; box-shadow:none !important;
+    flex:1; min-width:6rem; padding:.2rem; min-height:auto;
+  }
+  .tags input:focus{outline:none}
+  .tag-hint{font-size:.76rem; color:var(--ink-2); margin-top:-.1rem}
+
+  .add-row{margin-top:1.1rem}
+  .btn{
+    font-family:inherit; font-size:.98rem; cursor:pointer;
+    border-radius:10px; padding:.7rem 1.1rem; border:1px solid var(--line);
+    background:var(--card); color:var(--ink); letter-spacing:.02em;
+  }
+  .btn:hover{border-color:var(--seal); color:var(--seal)}
+  .btn.block{width:100%; border-style:dashed; padding:.9rem}
+  .btn.primary{
+    background:var(--seal); color:var(--paper); border-color:var(--seal); font-weight:500;
+  }
+  .btn.primary:hover{filter:brightness(1.06); color:var(--paper)}
+  .btn:disabled{opacity:.5; cursor:not-allowed}
+
+  .output{margin-top:2rem}
+  h2{font-size:1.28rem; font-weight:600; letter-spacing:.03em;
+    margin:0 0 .3rem; padding-bottom:.4rem; border-bottom:1px solid var(--line)}
+  .out-hint{color:var(--ink-2); font-size:.9rem; margin:.5rem 0 .8rem}
+  textarea.preview{
+    width:100%; min-height:200px; font-size:.9rem; line-height:1.55;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    background:var(--field); border:1px solid var(--line); border-radius:12px;
+    padding:.9rem 1rem; color:var(--ink); white-space:pre; overflow:auto;
+  }
+  .out-actions{display:flex; gap:.7rem; margin-top:.9rem; flex-wrap:wrap}
+  .toast{
+    font-size:.86rem; color:var(--seal); margin-top:.6rem;
+    min-height:1.2rem; letter-spacing:.02em;
+  }
+
+  .how{
+    margin-top:2rem; padding:1.1rem 1.3rem; background:var(--card);
+    border:1px solid var(--line); border-radius:12px;
+  }
+  .how h3{margin:0 0 .5rem; font-size:1.02rem; font-weight:600}
+  .how ol{margin:.4rem 0 0; padding-left:1.3rem; color:var(--ink-2); font-size:.92rem}
+  .how li{margin:.35rem 0}
+
+  footer{margin-top:2.6rem; padding-top:1.3rem; border-top:1px solid var(--line);
+    color:var(--ink-2); font-size:.85rem; display:flex; gap:1.2rem; flex-wrap:wrap}
+  footer a{color:var(--ink-2); text-underline-offset:3px}
+
+  @media (max-width:520px){
+    .grid{grid-template-columns:1fr}
+    h1{font-size:1.6rem}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <span class="seal serif" aria-hidden="true">錄</span>
+      <span class="brand-name">鴨鴨六爻</span>
+    </div>
+    <h1 class="serif">記錄轉檔小工具</h1>
+    <p class="intro">把手上的卦記錄填進表格，就會自動整理成鴨鴨六爻能匯入的 JSON 檔。不用會寫程式。</p>
+    <p class="privacy-note"><b>放心：</b>這個工具完全在你的瀏覽器裡執行，不連網、不上傳，你填的內容不會傳到任何地方。</p>
+  </header>
+
+  <main>
+    <div class="cards" id="cards"><!-- 記錄卡片由 JS 產生 --></div>
+
+    <div class="add-row">
+      <button class="btn block" id="addBtn" type="button">＋ 新增一筆記錄</button>
+    </div>
+
+    <section class="output">
+      <h2 class="serif">產生的 JSON</h2>
+      <p class="out-hint">下方會即時更新。填好後按「下載檔案」或「複製」，再到 App 的「記錄管理 → 選擇檔案匯入」匯入。</p>
+      <textarea class="preview" id="preview" readonly spellcheck="false"></textarea>
+      <div class="out-actions">
+        <button class="btn primary" id="downloadBtn" type="button">下載檔案（.json）</button>
+        <button class="btn" id="copyBtn" type="button">複製 JSON</button>
+        <button class="btn" id="clearBtn" type="button">全部清空</button>
+      </div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="how">
+      <h3>怎麼用</h3>
+      <ol>
+        <li>一筆記錄填一張卡片；同一次要匯入多筆，就按「新增一筆記錄」加卡片。</li>
+        <li><b>主卦</b>是必填（點欄位會跳出六十四卦清單可選，也可以自己打字）。若這一卦有動爻、變出另一個卦，就填<b>變卦</b>；沒有動爻可留空。</li>
+        <li>其餘欄位（占者、所問、日期時間、記錄、標籤）都是選填，有就填、方便日後查找。</li>
+        <li>填好 → 下載檔案 → 傳到手機 → 在 App 用「選擇檔案匯入」選它即可。</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <span>鴨鴨六爻</span>
+    <a href="privacy.html">隱私政策</a>
+    <a href="support.html">技術支援</a>
+  </footer>
+</div>
+
+<!-- 六十四卦名（標準卦名，供 datalist 建議；可自行打字覆蓋） -->
+<datalist id="guaList">
+  <option>乾為天</option><option>坤為地</option><option>水雷屯</option><option>山水蒙</option>
+  <option>水天需</option><option>天水訟</option><option>地水師</option><option>水地比</option>
+  <option>風天小畜</option><option>天澤履</option><option>地天泰</option><option>天地否</option>
+  <option>天火同人</option><option>火天大有</option><option>地山謙</option><option>雷地豫</option>
+  <option>澤雷隨</option><option>山風蠱</option><option>地澤臨</option><option>風地觀</option>
+  <option>火雷噬嗑</option><option>山火賁</option><option>山地剝</option><option>地雷復</option>
+  <option>天雷無妄</option><option>山天大畜</option><option>山雷頤</option><option>澤風大過</option>
+  <option>坎為水</option><option>離為火</option><option>澤山咸</option><option>雷風恆</option>
+  <option>天山遯</option><option>雷天大壯</option><option>火地晉</option><option>地火明夷</option>
+  <option>風火家人</option><option>火澤睽</option><option>水山蹇</option><option>雷水解</option>
+  <option>山澤損</option><option>風雷益</option><option>澤天夬</option><option>天風姤</option>
+  <option>澤地萃</option><option>地風升</option><option>澤水困</option><option>水風井</option>
+  <option>澤火革</option><option>火風鼎</option><option>震為雷</option><option>艮為山</option>
+  <option>風山漸</option><option>雷澤歸妹</option><option>雷火豐</option><option>火山旅</option>
+  <option>巽為風</option><option>兌為澤</option><option>風水渙</option><option>水澤節</option>
+  <option>風澤中孚</option><option>雷山小過</option><option>水火既濟</option><option>火水未濟</option>
+</datalist>
+
+<script>
+(function(){
+  "use strict";
+
+  // 每筆記錄的資料模型；欄位對齊 App 匯入範例
+  var records = [];
+  var seq = 0;
+
+  var cardsEl    = document.getElementById("cards");
+  var previewEl  = document.getElementById("preview");
+  var toastEl    = document.getElementById("toast");
+
+  function makeRecord(){
+    return { _id: ++seq, 主卦:"", 變卦:"", 占者:"", 所問:"",
+             占日:"", 占時:"", 記錄:"", 標籤:[] };
+  }
+
+  function field(labelHTML, node){
+    var wrap = document.createElement("div");
+    wrap.className = "field";
+    var lab = document.createElement("label");
+    lab.innerHTML = labelHTML;
+    wrap.appendChild(lab);
+    wrap.appendChild(node);
+    return wrap;
+  }
+
+  function input(type, value, oninput){
+    var el = document.createElement("input");
+    el.type = type; el.value = value || "";
+    el.addEventListener("input", function(){ oninput(el.value); });
+    return el;
+  }
+
+  function guaInput(value, oninput){
+    var el = input("text", value, oninput);
+    el.setAttribute("list", "guaList");
+    el.placeholder = "點選或輸入卦名";
+    el.autocapitalize = "off"; el.autocomplete = "off";
+    return el;
+  }
+
+  function textarea(value, oninput, rows){
+    var el = document.createElement("textarea");
+    el.value = value || ""; el.rows = rows || 1;
+    el.addEventListener("input", function(){ oninput(el.value); });
+    return el;
+  }
+
+  // 標籤 chip 輸入（最多 3 個）
+  function tagField(rec){
+    var box = document.createElement("div");
+    box.className = "tags";
+    var inp = document.createElement("input");
+    inp.type = "text"; inp.placeholder = "輸入後按 Enter 或逗號";
+    inp.autocapitalize = "off"; inp.autocomplete = "off";
+
+    function renderChips(){
+      // 移除既有 chip，保留 input
+      Array.prototype.slice.call(box.querySelectorAll(".chip")).forEach(function(c){ c.remove(); });
+      rec.標籤.forEach(function(tag, i){
+        var chip = document.createElement("span");
+        chip.className = "chip";
+        chip.appendChild(document.createTextNode(tag));
+        var x = document.createElement("button");
+        x.type = "button"; x.textContent = "×"; x.setAttribute("aria-label","移除標籤");
+        x.addEventListener("click", function(){
+          rec.標籤.splice(i,1); renderChips(); refresh();
+        });
+        chip.appendChild(x);
+        box.insertBefore(chip, inp);
+      });
+      var full = rec.標籤.length >= 3;
+      inp.style.display = full ? "none" : "";
+    }
+
+    function addTag(){
+      var v = inp.value.trim();
+      if(v && rec.標籤.length < 3 && rec.標籤.indexOf(v) === -1){
+        rec.標籤.push(v); inp.value = ""; renderChips(); refresh();
+      } else { inp.value = ""; }
+    }
+
+    inp.addEventListener("keydown", function(e){
+      if(e.key === "Enter" || e.key === ","){ e.preventDefault(); addTag(); }
+      else if(e.key === "Backspace" && inp.value === "" && rec.標籤.length){
+        rec.標籤.pop(); renderChips(); refresh();
+      }
+    });
+    inp.addEventListener("blur", addTag);
+
+    box.appendChild(inp);
+    renderChips();
+    return box;
+  }
+
+  function buildCard(rec){
+    var card = document.createElement("div");
+    card.className = "card";
+    card.dataset.id = rec._id;
+
+    var head = document.createElement("div");
+    head.className = "card-head";
+    var title = document.createElement("span");
+    title.className = "card-title"; // 編號於 renumber() 填入
+    var del = document.createElement("button");
+    del.className = "del"; del.type = "button"; del.textContent = "刪除";
+    del.addEventListener("click", function(){ removeRecord(rec._id); });
+    head.appendChild(title); head.appendChild(del);
+    card.appendChild(head);
+
+    var grid = document.createElement("div");
+    grid.className = "grid";
+
+    grid.appendChild(field('主卦 <span class="req">＊</span>',
+      guaInput(rec.主卦, function(v){ rec.主卦 = v; refresh(); })));
+    grid.appendChild(field('變卦 <span style="color:var(--ink-2)">（有動爻才填）</span>',
+      guaInput(rec.變卦, function(v){ rec.變卦 = v; refresh(); })));
+
+    grid.appendChild(field("占者",
+      input("text", rec.占者, function(v){ rec.占者 = v; refresh(); })));
+    var qEl = textarea(rec.所問, function(v){ rec.所問 = v; refresh(); }, 1);
+    grid.appendChild(field("所問", qEl));
+
+    grid.appendChild(field("占日",
+      input("date", rec.占日, function(v){ rec.占日 = v; refresh(); })));
+    grid.appendChild(field("占時",
+      input("time", rec.占時, function(v){ rec.占時 = v; refresh(); })));
+
+    var noteWrap = field("記錄 / 筆記",
+      textarea(rec.記錄, function(v){ rec.記錄 = v; refresh(); }, 2));
+    noteWrap.classList.add("full");
+    grid.appendChild(noteWrap);
+
+    var tagWrap = document.createElement("div");
+    tagWrap.className = "field full";
+    var tagLab = document.createElement("label");
+    tagLab.innerHTML = '標籤 <span style="color:var(--ink-2)">（選填，最多 3 個）</span>';
+    tagWrap.appendChild(tagLab);
+    tagWrap.appendChild(tagField(rec));
+    grid.appendChild(tagWrap);
+
+    card.appendChild(grid);
+    return card;
+  }
+
+  function renumber(){
+    var cards = cardsEl.querySelectorAll(".card");
+    for(var i=0;i<cards.length;i++){
+      cards[i].querySelector(".card-title").textContent = "記錄 " + (i+1);
+    }
+  }
+
+  function addRecord(){
+    var rec = makeRecord();
+    records.push(rec);
+    cardsEl.appendChild(buildCard(rec));
+    renumber(); refresh();
+  }
+
+  function removeRecord(id){
+    records = records.filter(function(r){ return r._id !== id; });
+    var node = cardsEl.querySelector('.card[data-id="'+id+'"]');
+    if(node) node.remove();
+    if(records.length === 0) addRecord();
+    renumber(); refresh();
+  }
+
+  // 依 App 範例的鍵順序輸出；空欄位省略
+  function toJSON(){
+    var out = records.map(function(r){
+      var o = {};
+      if(r.主卦) o.主卦 = r.主卦;
+      if(r.變卦) o.變卦 = r.變卦;
+      if(r.占日) o.占日 = r.占日.replace(/-/g, ""); // 2026-07-03 → 20260703
+      if(r.占時) o.占時 = r.占時;                    // 13:15
+      if(r.占者) o.占者 = r.占者;
+      if(r.所問) o.所問 = r.所問;
+      if(r.記錄) o.記錄 = r.記錄;
+      if(r.標籤 && r.標籤.length) o.標籤 = r.標籤.slice();
+      return o;
+    }).filter(function(o){ return Object.keys(o).length > 0; });
+    return JSON.stringify(out, null, 2);
+  }
+
+  function refresh(){
+    previewEl.value = toJSON();
+    var hasGua = records.some(function(r){ return r.主卦; });
+    document.getElementById("downloadBtn").disabled = !hasGua;
+    document.getElementById("copyBtn").disabled = !hasGua;
+  }
+
+  var toastTimer;
+  function toast(msg){
+    toastEl.textContent = msg;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.textContent = ""; }, 2600);
+  }
+
+  // 下載
+  document.getElementById("downloadBtn").addEventListener("click", function(){
+    var d = new Date();
+    var pad = function(n){ return (n<10?"0":"")+n; };
+    var stamp = "" + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate());
+    var blob = new Blob([toJSON()], {type:"application/json;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "鴨鴨六爻_記錄_" + stamp + ".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    toast("已下載檔案，傳到手機後用 App 匯入即可。");
+  });
+
+  // 複製
+  document.getElementById("copyBtn").addEventListener("click", function(){
+    var text = toJSON();
+    function fallback(){
+      previewEl.focus(); previewEl.select();
+      try { document.execCommand("copy"); toast("已複製到剪貼簿。"); }
+      catch(e){ toast("複製失敗，請手動選取上方文字複製。"); }
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ toast("已複製到剪貼簿。"); }, fallback);
+    } else { fallback(); }
+  });
+
+  // 清空
+  document.getElementById("clearBtn").addEventListener("click", function(){
+    if(!confirm("確定要清空所有記錄嗎？此動作無法復原。")) return;
+    records = []; cardsEl.innerHTML = "";
+    addRecord(); toast("已清空。");
+  });
+
+  document.getElementById("addBtn").addEventListener("click", addRecord);
+
+  // 起始一張空卡
+  addRecord();
+})();
+</script>
+</body>
+</html>
