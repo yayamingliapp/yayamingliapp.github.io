@@ -113,10 +113,11 @@
     display:flex; align-items:center; gap:.5rem;
     padding:.6rem 1.1rem; border:1px solid var(--line); border-radius:999px;
     background:var(--card); color:var(--ink-2); font-size:.92rem;
-    opacity:.6; cursor:default; /* 預留：暫不可點 */
+    text-decoration:none; transition:color .15s, border-color .15s, transform .15s;
   }
+  .soc:hover{color:var(--seal); border-color:var(--seal); transform:translateY(-1px)}
+  .soc:focus-visible{outline:2px solid var(--seal); outline-offset:3px}
   .soc svg{width:20px; height:20px; flex:none}
-  .soc .soon-tag{font-size:.72rem; letter-spacing:.08em; color:var(--seal)}
 
   /* footer */
   footer{
@@ -208,20 +209,20 @@
 
   <section class="social wrap">
     <h2 class="serif">加入社群</h2>
-    <p class="hint">帳號即將開通，敬請期待</p>
+    <p class="hint">歡迎追蹤鴨鴨命理，最新消息不錯過</p>
     <div class="social-row">
-      <span class="soc" title="LINE 即將開通">
+      <a class="soc" href="https://lin.ee/oSstUCa" target="_blank" rel="noopener" title="LINE 官方帳號">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="14" rx="5"/><path d="M7 9v5M7 9h2M17 9v5M17 14h-2.5M17 11.5h-2.5M12 9v5"/></svg>
-        LINE <span class="soon-tag">即將開通</span>
-      </span>
-      <span class="soc" title="Threads 即將開通">
+        LINE
+      </a>
+      <a class="soc" href="https://www.threads.com/@yayamingli" target="_blank" rel="noopener" title="Threads @yayamingli">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21c-4.5 0-7.5-3.2-7.5-9S7.2 3 12 3c3.4 0 5.7 1.6 6.6 4"/><path d="M9.5 13.5c0-2 1.4-3 3-3s3 1 3 3-1.3 3.2-3.2 3.2c-1.6 0-2.3-1-2.3-2 0-1.1 1-1.7 2.2-1.7 2.4 0 3.8 1.6 3.8 3.7"/></svg>
-        Threads <span class="soon-tag">即將開通</span>
-      </span>
-      <span class="soc" title="Instagram 即將開通">
+        Threads
+      </a>
+      <a class="soc" href="https://www.instagram.com/yayamingli" target="_blank" rel="noopener" title="Instagram @yayamingli">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg>
-        Instagram <span class="soon-tag">即將開通</span>
-      </span>
+        Instagram
+      </a>
     </div>
   </section>
 
