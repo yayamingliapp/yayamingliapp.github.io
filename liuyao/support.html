@@ -2,24 +2,26 @@
 <!-- ================================================================
      鴨鴨六爻 — 技術支援
      聯絡 Email 已填入：yayamingli.app@gmail.com
-     聯絡 Email 已填入。LINE 官方帳號上線後，可把聯絡區塊補上 LINE 連結
+     問題回報表單使用 FormSubmit.co（action 指向上述信箱）；
+       上線後需送出一筆測試並點確認信啟用，之後可改用 /el/<hash> 匿名端點。
+     LINE 官方帳號上線後，可把聯絡區塊補上 LINE 連結
      ================================================================ -->
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>技術支援 — 鴨鴨六爻</title>
-<meta name="description" content="鴨鴨六爻的技術支援與常見問題。有問題歡迎來信。">
+<meta name="description" content="鴨鴨六爻的技術支援與常見問題。可直接填表回報問題，或來信與我們聯絡。">
 <meta name="theme-color" content="#EFE9DA">
 <style>
   :root{
     --paper:#EFE9DA; --card:#FAF6EC; --ink:#26231E; --ink-2:#5C574E;
-    --seal:#9E3B2E; --line:#DDD3BF; --link:#8A3527;
+    --seal:#9E3B2E; --line:#DDD3BF; --link:#8A3527; --field:#FFFCF4;
   }
   @media (prefers-color-scheme: dark){
     :root{
       --paper:#17150F; --card:#201D16; --ink:#E7E0D0; --ink-2:#A69E8C;
-      --seal:#D08A7C; --line:#322E24; --link:#E0A18F;
+      --seal:#D08A7C; --line:#322E24; --link:#E0A18F; --field:#1B1811;
     }
   }
   *{box-sizing:border-box}
@@ -74,6 +76,44 @@
   details p{margin:.2rem 0 1rem; color:var(--ink-2); line-height:1.8}
   a{color:var(--link); text-underline-offset:3px}
   a:focus-visible{outline:2px solid var(--seal); outline-offset:3px; border-radius:3px}
+  /* 問題回報表單 */
+  form.report{margin:.8rem 0 0}
+  .field{display:flex; flex-direction:column; gap:.34rem; margin-bottom:.9rem}
+  .field label{font-size:.82rem; color:var(--ink-2)}
+  .field label .req{color:var(--seal)}
+  .field .opt{color:var(--ink-2); font-weight:400}
+  select, input.txt, textarea{
+    font-family:inherit; font-size:1rem; color:var(--ink);
+    background:var(--field); border:1px solid var(--line); border-radius:9px;
+    padding:.6rem .7rem; width:100%; appearance:none;
+  }
+  textarea{resize:vertical; min-height:6.5em; line-height:1.7}
+  select{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%235C574E' stroke-width='1.5' d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right .8rem center; padding-right:2.2rem;
+  }
+  select:focus, input.txt:focus, textarea:focus{
+    outline:none; border-color:var(--seal); box-shadow:0 0 0 3px rgba(158,59,46,.14);
+  }
+  @media (prefers-color-scheme: dark){
+    select:focus, input.txt:focus, textarea:focus{box-shadow:0 0 0 3px rgba(208,138,124,.18)}
+  }
+  .btn{
+    font-family:inherit; font-size:.98rem; cursor:pointer; border-radius:10px;
+    padding:.72rem 1.4rem; border:1px solid var(--seal); background:var(--seal);
+    color:var(--paper); font-weight:500; letter-spacing:.03em;
+  }
+  .btn:hover{filter:brightness(1.06)}
+  .btn:focus-visible{outline:2px solid var(--seal); outline-offset:3px}
+  .form-note{margin:.9rem 0 0; font-size:.8rem; color:var(--ink-2); line-height:1.7}
+  .toast{
+    position:fixed; left:50%; bottom:1.4rem; transform:translateX(-50%) translateY(1rem);
+    background:var(--seal); color:var(--paper); padding:.7rem 1.2rem; border-radius:999px;
+    font-size:.92rem; box-shadow:0 8px 24px rgba(60,45,25,.25);
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:50;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .hp{position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden}
   footer{margin-top:3rem; padding-top:1.4rem; border-top:1px solid var(--line);
     color:var(--ink-2); font-size:.85rem; display:flex; gap:1.2rem; flex-wrap:wrap}
   footer a{color:var(--ink-2)}
@@ -87,15 +127,56 @@
       <span class="brand-name">鴨鴨六爻</span>
     </a>
     <h1>技術支援</h1>
-    <p class="intro">使用上遇到問題、有建議、或想回報狀況，都歡迎與我們聯絡。</p>
+    <p class="intro">使用上遇到問題、有建議、或想回報狀況，都歡迎與我們聯絡，或直接<a href="#report">填表回報</a>。</p>
   </header>
 
   <main>
     <div class="contact">
       <h2>聯絡方式</h2>
       <p>電子郵件：<a href="mailto:yayamingli.app@gmail.com">yayamingli.app@gmail.com</a></p>
-      <p style="color:var(--ink-2); font-size:.92rem; margin-bottom:0">我們通常會在 2～3 個工作天內回覆。來信時若能附上你的裝置型號與 iOS 版本，會幫助我們更快釐清問題。</p>
+      <p style="color:var(--ink-2); font-size:.92rem; margin-bottom:0">我們通常會在 2～3 個工作天內回覆。來信時若能附上你的裝置型號與 iOS 版本，會幫助我們更快釐清問題。不想寄信也沒關係，可直接<a href="#report">填表回報</a>。</p>
     </div>
+
+    <h2 class="sec" id="report">問題回報</h2>
+    <p style="color:var(--ink-2); margin:.2rem 0 1rem">不想開信箱、不想自己打主旨？填一填直接送出就好，我們收到後會盡快處理。</p>
+
+    <form class="report" action="https://formsubmit.co/yayamingli.app@gmail.com" method="POST">
+      <input type="hidden" name="_subject" value="鴨鴨六爻問題回報">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_next" value="https://yayamingliapp.github.io/liuyao/support.html?sent=1">
+      <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <div class="field">
+        <label for="rp-cat">問題分類 <span class="req">＊</span></label>
+        <select id="rp-cat" name="問題分類" required>
+          <option value="" disabled selected>請選擇…</option>
+          <option>操作／使用問題</option>
+          <option>程式錯誤／當機</option>
+          <option>排盤或內容錯誤</option>
+          <option>功能建議</option>
+          <option>購買問題</option>
+          <option>其他</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="rp-desc">問題描述 <span class="req">＊</span></label>
+        <textarea id="rp-desc" name="問題描述" required placeholder="請描述你遇到的狀況、操作步驟，或想反映的建議…"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="rp-dev">裝置與 iOS 版本 <span class="opt">（選填，利於除錯）</span></label>
+        <input class="txt" id="rp-dev" name="裝置與iOS版本" placeholder="例：iPhone 15、iOS 26.1">
+      </div>
+
+      <div class="field">
+        <label for="rp-mail">你的 Email <span class="opt">（選填，填了我們才能回覆你）</span></label>
+        <input class="txt" id="rp-mail" type="email" name="回覆信箱" placeholder="you@example.com">
+      </div>
+
+      <button class="btn" type="submit">送出回報</button>
+      <p class="form-note">送出的內容會透過表單服務 FormSubmit 轉寄到我們的信箱，僅用於回覆與處理你回報的問題。</p>
+    </form>
 
     <h2 class="sec">常見問題</h2>
 
@@ -150,5 +231,55 @@
     <a href="privacy.html">隱私政策</a>
   </footer>
 </div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var form = document.querySelector("form.report");
+  if(!form) return;
+  var toastEl = document.getElementById("toast"), toastTimer;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove("show"); }, 3200);
+  }
+
+  // 送出成功導回（無 JS 的 _next fallback）時顯示提示
+  if(location.search.indexOf("sent=1") !== -1){
+    toast("已送出，謝謝你的回報！");
+    history.replaceState(null, "", location.pathname + location.hash);
+  }
+
+  form.addEventListener("submit", function(e){
+    // 蜜罐有值 → 機器人，靜默不送
+    var honey = form.querySelector('input[name="_honey"]');
+    if(honey && honey.value){ e.preventDefault(); return; }
+    if(!form.reportValidity()) return; // 交給瀏覽器原生必填提示
+
+    e.preventDefault();
+    var btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true; btn.style.opacity = ".6";
+
+    fetch("https://formsubmit.co/ajax/yayamingli.app@gmail.com", {
+      method: "POST",
+      headers: { "Accept": "application/json" },
+      body: new FormData(form)
+    })
+    .then(function(r){ if(!r.ok) throw new Error(); return r.json(); })
+    .then(function(){
+      form.reset();
+      toast("已送出，謝謝你的回報！");
+      btn.disabled = false; btn.style.opacity = "";
+    })
+    .catch(function(){
+      // AJAX 失敗 → 退回原生提交（會導向 _next）
+      btn.disabled = false; btn.style.opacity = "";
+      form.submit();
+    });
+  });
+})();
+</script>
 </body>
 </html>
