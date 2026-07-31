@@ -71,7 +71,8 @@
     padding:1.4rem 1.1rem 1.3rem; text-align:center; position:relative;
     border-top:3px solid var(--accent); display:flex; flex-direction:column; align-items:center;
   }
-  .card img{width:112px; height:112px; margin-bottom:.7rem}
+  .card img{width:112px; height:112px; margin-bottom:.7rem; border-radius:23%;
+    box-shadow:0 6px 14px rgba(60,45,25,.16)}
   .card h3{font-size:1.35rem; font-weight:600; letter-spacing:.1em; margin:0 0 .3rem}
   .card p{font-size:.9rem; color:var(--ink-2); margin:0 0 1rem; min-height:2.6em}
   .enter{
@@ -104,7 +105,7 @@
   .feat p{margin:0; font-size:.84rem; color:var(--ink-2); line-height:1.7}
   @media(max-width:640px){.feat-grid{grid-template-columns:1fr}}
 
-  /* social (預留) */
+  /* social （預留） */
   .social{margin:3.2rem auto 0; text-align:center}
   .social h2{font-size:1.3rem; font-weight:600; letter-spacing:.06em; margin:0 0 .3rem}
   .social .hint{color:var(--ink-2); font-size:.85rem; margin:0 0 1.1rem; letter-spacing:.06em}
@@ -140,14 +141,14 @@
 <body>
   <div class="wrap">
     <header>
-      <img src="logo.png" alt="鴨鴨命理標誌">
+      <img src="image/web/logo.png" alt="鴨鴨命理標誌">
       <span class="name serif">鴨鴨命理</span>
     </header>
 
     <section class="hero">
       <h1 class="serif">鴨鴨命理</h1>
       <p class="slogan serif">掌上排盤，輕鬆問卜</p>
-      <div class="hero-img"><img src="hero.jpg" alt="鴨鴨命理系列"></div>
+      <div class="hero-img"><img src="image/hero.jpg" alt="鴨鴨命理系列"></div>
     </section>
 
     <section class="intro">
@@ -177,7 +178,7 @@
       <div class="cards">
 
         <div class="card" style="--accent:var(--e-water)">
-          <img src="liuyao.png" alt="六爻">
+          <img src="image/web/icon_liuyao.png" alt="六爻">
           <div class="card-body">
             <h3 class="serif">六爻</h3>
             <p>擲銅錢、擲骰起卦，掌上排盤解卦。</p>
@@ -186,21 +187,21 @@
         </div>
 
         <div class="card" style="--accent:var(--e-wood)">
-          <img src="bazi.png" alt="八字">
+          <img src="image/web/icon_bazi.png" alt="八字">
           <div class="card-body">
             <h3 class="serif">八字</h3>
-            <p>排四柱、看五行喜忌。</p>
+            <p>排四柱、大運流年，古書命例對照。</p>
           </div>
-          <span class="soon">敬請期待</span>
+          <a class="enter" href="bazi/">搶先看 →</a>
         </div>
 
         <div class="card" style="--accent:var(--e-earth)">
-          <img src="liuren.png" alt="大六壬">
+          <img src="image/web/icon_liuren.png" alt="大六壬">
           <div class="card-body">
             <h3 class="serif">大六壬</h3>
             <p>起課排盤、四課三傳。</p>
           </div>
-          <span class="soon">敬請期待</span>
+          <a class="enter" href="liuren/">搶先看 →</a>
         </div>
 
       </div>
@@ -228,7 +229,8 @@
 
   <footer>
     <span class="mail">聯絡我們：<a href="mailto:yayamingli.app@gmail.com">yayamingli.app@gmail.com</a></span>
-    <span>六爻：<a href="liuyao/privacy.html">隱私政策</a>·<a href="liuyao/support.html">技術支援</a></span>
+    <span class="mail"><a href="privacy.html">隱私政策</a>·<a href="feedback.html">問題反饋</a></span>
+    <span>技術支援：<a href="liuyao/support.html">六爻</a>·<a href="bazi/support.html">八字</a>·<a href="liuren/support.html">六壬</a></span>
   </footer>
 </body>
 </html>
