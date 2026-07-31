@@ -123,12 +123,16 @@
 
       <fieldset>
         <legend>裝置資訊（問題回報時建議填寫）</legend>
+        <div class="opts" style="margin-bottom:.8rem">
+          <label><input type="radio" name="platform" value="iPhone" checked>iPhone</label>
+          <label><input type="radio" name="platform" value="Android">Android</label>
+        </div>
         <div class="row2">
           <label>手機型號
-            <input type="text" id="device" placeholder="例如 iPhone 15、Pixel 8">
+            <input type="text" id="device" placeholder="例如 iPhone 15">
           </label>
           <label>系統版本
-            <input type="text" id="osver" placeholder="例如 iOS 26、Android 15">
+            <input type="text" id="osver" placeholder="例如 iOS 26">
           </label>
         </div>
       </fieldset>
@@ -156,17 +160,28 @@
 </div>
 
 <script>
-document.getElementById('fb').addEventListener('submit', function (e) {
+var fb = document.getElementById('fb');
+
+Array.prototype.forEach.call(fb.platform, function (r) {
+  r.addEventListener('change', function () {
+    var ios = fb.platform.value === 'iPhone';
+    document.getElementById('device').placeholder = ios ? '例如 iPhone 15' : '例如 Pixel 8、Galaxy S24';
+    document.getElementById('osver').placeholder = ios ? '例如 iOS 26' : '例如 Android 15';
+  });
+});
+
+fb.addEventListener('submit', function (e) {
   e.preventDefault();
   var f = e.target;
-  var app = f.app.value, kind = f.kind.value;
+  var app = f.app.value, kind = f.kind.value, platform = f.platform.value;
   var msg = document.getElementById('msg').value.trim();
   var device = document.getElementById('device').value.trim();
   var osver = document.getElementById('osver').value.trim();
   var subject = '[' + app + '] ' + kind;
   var body = 'App:' + app + '\n類型：' + kind + '\n\n' +
     (msg || '（請在此描述）') +
-    '\n\n——\n裝置型號：' + device + '\n系統版本：' + osver + '\nApp 版本：';
+    '\n\n——\n手機：' + platform +
+    '\n裝置型號：' + device + '\n系統版本：' + osver + '\nApp 版本：';
   location.href = 'mailto:yayamingli.app@gmail.com?subject=' +
     encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 });
