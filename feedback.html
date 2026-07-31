@@ -64,6 +64,13 @@
     padding: .9rem 1rem; font:inherit; line-height:1.75;
   }
   textarea:focus-visible{outline:2px solid var(--seal); outline-offset:2px}
+  .row2{display:flex; gap:.8rem; flex-wrap:wrap}
+  .row2 > label{flex:1 1 14rem; display:block; font-size:.95rem; color:var(--ink-2)}
+  input[type=text]{
+    width:100%; margin-top:.3rem; background:var(--card); color:var(--ink);
+    border:1px solid var(--line); border-radius:10px; padding:.65rem .9rem; font:inherit;
+  }
+  input[type=text]:focus-visible{outline:2px solid var(--seal); outline-offset:2px}
   .hint{color:var(--ink-2); font-size:.85rem; margin:.5rem 0 0}
   .send{
     margin-top:2rem; display:inline-block; border:0; cursor:pointer;
@@ -115,9 +122,20 @@
       </fieldset>
 
       <fieldset>
+        <legend>裝置資訊（問題回報時建議填寫）</legend>
+        <div class="row2">
+          <label>手機型號
+            <input type="text" id="device" placeholder="例如 iPhone 15、Pixel 8">
+          </label>
+          <label>系統版本
+            <input type="text" id="osver" placeholder="例如 iOS 26、Android 15">
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
         <legend>想告訴我們的內容</legend>
         <textarea id="msg" placeholder="請描述遇到的狀況或建議。若是問題回報，寫下操作步驟會很有幫助。"></textarea>
-        <p class="hint">回報問題時，若能附上裝置型號與系統版本（例如 iPhone 15/iOS 26、Pixel 8/Android 15），能幫助我們更快釐清。</p>
       </fieldset>
 
       <button class="send" type="submit">產生郵件寄給我們 ✉</button>
@@ -126,7 +144,7 @@
 
     <div class="alt">
       郵件打不開？直接寫信到
-      <a href="mailto:yayamingli.app@gmail.com">yayamingli.app@gmail.com</a>,
+      <a href="mailto:yayamingli.app@gmail.com">yayamingli.app@gmail.com</a>，
       或透過 <a href="https://lin.ee/oSstUCa" target="_blank" rel="noopener">LINE 官方帳號</a> 傳訊息給我們。
     </div>
   </main>
@@ -143,10 +161,12 @@ document.getElementById('fb').addEventListener('submit', function (e) {
   var f = e.target;
   var app = f.app.value, kind = f.kind.value;
   var msg = document.getElementById('msg').value.trim();
+  var device = document.getElementById('device').value.trim();
+  var osver = document.getElementById('osver').value.trim();
   var subject = '[' + app + '] ' + kind;
   var body = 'App:' + app + '\n類型：' + kind + '\n\n' +
     (msg || '（請在此描述）') +
-    '\n\n——\n裝置型號：\n系統版本：\nApp 版本：';
+    '\n\n——\n裝置型號：' + device + '\n系統版本：' + osver + '\nApp 版本：';
   location.href = 'mailto:yayamingli.app@gmail.com?subject=' +
     encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 });
