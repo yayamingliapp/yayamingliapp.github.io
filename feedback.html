@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <!-- ================================================================
      鴨鴨命理 — 問題反饋
-     靜態頁：選 App 與問題類型後，產生預填的 mailto 郵件
+     表單經 FormSubmit 直接轉寄到 yayamingli.app@gmail.com（免開郵件 App）
+     注意：第一次有人送出時，FormSubmit 會寄一封啟用信到收件信箱，
+     點擊 Activate 之後表單才會正式生效。
      ================================================================ -->
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>問題反饋 — 鴨鴨命理</title>
-<meta name="description" content="回報問題或提供建議給鴨鴨命理團隊：選擇 App 與問題類型，一鍵產生郵件。">
+<meta name="description" content="回報問題或提供建議給鴨鴨命理團隊：選擇 App 與問題類型，填好直接送出。">
 <meta name="theme-color" content="#EFE9DA">
 <style>
   :root{
     --paper:#EFE9DA; --card:#FAF6EC; --ink:#26231E; --ink-2:#5C574E;
-    --seal:#9E3B2E; --line:#DDD3BF; --link:#8A3527;
+    --seal:#9E3B2E; --line:#DDD3BF; --link:#8A3527; --ok:#4E8A63;
   }
   @media (prefers-color-scheme: dark){
     :root{
       --paper:#17150F; --card:#201D16; --ink:#E7E0D0; --ink-2:#A69E8C;
-      --seal:#D08A7C; --line:#322E24; --link:#E0A18F;
+      --seal:#D08A7C; --line:#322E24; --link:#E0A18F; --ok:#7FBD97;
     }
   }
   *{box-sizing:border-box}
@@ -41,6 +43,12 @@
     font-size:2rem; font-weight:600; margin:.2rem 0 .5rem; letter-spacing:.04em;
   }
   .intro{color:var(--ink-2); margin:.2rem 0 0}
+  .ok-banner{
+    display:none; margin:1.6rem 0 0; padding:1rem 1.3rem;
+    background:color-mix(in srgb, var(--ok) 12%, var(--card));
+    border:1px solid var(--ok); border-radius:12px; color:var(--ink);
+  }
+  .ok-banner.show{display:block}
   fieldset{border:0; margin:2rem 0 0; padding:0}
   legend{
     font-family:"Kaiti TC","STKaiti","Songti TC","Noto Serif TC",serif;
@@ -66,11 +74,13 @@
   textarea:focus-visible{outline:2px solid var(--seal); outline-offset:2px}
   .row2{display:flex; gap:.8rem; flex-wrap:wrap}
   .row2 > label{flex:1 1 14rem; display:block; font-size:.95rem; color:var(--ink-2)}
-  input[type=text]{
+  input[type=text], input[type=email]{
     width:100%; margin-top:.3rem; background:var(--card); color:var(--ink);
     border:1px solid var(--line); border-radius:10px; padding:.65rem .9rem; font:inherit;
   }
-  input[type=text]:focus-visible{outline:2px solid var(--seal); outline-offset:2px}
+  input[type=text]:focus-visible, input[type=email]:focus-visible{
+    outline:2px solid var(--seal); outline-offset:2px}
+  .req{color:var(--seal)}
   .hint{color:var(--ink-2); font-size:.85rem; margin:.5rem 0 0}
   .send{
     margin-top:2rem; display:inline-block; border:0; cursor:pointer;
@@ -97,57 +107,69 @@
     </a>
     <h1>問題反饋</h1>
     <p class="intro">使用上遇到狀況、有想要的功能，或任何想說的話，都歡迎告訴我們。</p>
+    <div class="ok-banner" id="okBanner">已收到你的反饋，謝謝！我們會盡快回覆到你填寫的 Email。</div>
   </header>
 
   <main>
-    <form id="fb">
+    <form id="fb" action="https://formsubmit.co/yayamingli.app@gmail.com" method="POST">
+      <input type="hidden" name="_subject" id="subj" value="鴨鴨命理問題反饋">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" id="nextUrl" value="https://yayamingliapp.github.io/feedback.html?sent=1">
+      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+
       <fieldset>
-        <legend>哪一款 App?</legend>
+        <legend>哪一款 App？</legend>
         <div class="opts">
-          <label><input type="radio" name="app" value="鴨鴨六爻" checked>鴨鴨六爻</label>
-          <label><input type="radio" name="app" value="鴨鴨八字">鴨鴨八字</label>
-          <label><input type="radio" name="app" value="鴨鴨六壬">鴨鴨六壬</label>
-          <label><input type="radio" name="app" value="官網/其他">官網/其他</label>
+          <label><input type="radio" name="App" value="鴨鴨六爻" checked>鴨鴨六爻</label>
+          <label><input type="radio" name="App" value="鴨鴨八字">鴨鴨八字</label>
+          <label><input type="radio" name="App" value="鴨鴨六壬">鴨鴨六壬</label>
+          <label><input type="radio" name="App" value="官網/其他">官網/其他</label>
         </div>
       </fieldset>
 
       <fieldset>
         <legend>反饋類型</legend>
         <div class="opts">
-          <label><input type="radio" name="kind" value="問題回報" checked>問題回報</label>
-          <label><input type="radio" name="kind" value="功能建議">功能建議</label>
-          <label><input type="radio" name="kind" value="購買/恢復問題">購買/恢復問題</label>
-          <label><input type="radio" name="kind" value="其他">其他</label>
+          <label><input type="radio" name="類型" value="問題回報" checked>問題回報</label>
+          <label><input type="radio" name="類型" value="功能建議">功能建議</label>
+          <label><input type="radio" name="類型" value="購買/恢復問題">購買/恢復問題</label>
+          <label><input type="radio" name="類型" value="其他">其他</label>
         </div>
       </fieldset>
 
       <fieldset>
         <legend>裝置資訊（問題回報時建議填寫）</legend>
         <div class="opts" style="margin-bottom:.8rem">
-          <label><input type="radio" name="platform" value="iPhone" checked>iPhone</label>
-          <label><input type="radio" name="platform" value="Android">Android</label>
+          <label><input type="radio" name="手機" value="iPhone" checked>iPhone</label>
+          <label><input type="radio" name="手機" value="Android">Android</label>
         </div>
         <div class="row2">
           <label>手機型號
-            <input type="text" id="device" placeholder="例如 iPhone 15">
+            <input type="text" name="手機型號" id="device" placeholder="例如 iPhone 15">
           </label>
           <label>系統版本
-            <input type="text" id="osver" placeholder="例如 iOS 26">
+            <input type="text" name="系統版本" id="osver" placeholder="例如 iOS 26">
           </label>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>想告訴我們的內容</legend>
-        <textarea id="msg" placeholder="請描述遇到的狀況或建議。若是問題回報，寫下操作步驟會很有幫助。"></textarea>
+        <legend>聯絡 Email<span class="req"> *</span></legend>
+        <input type="email" name="email" id="email" required placeholder="我們會回覆到這個信箱">
       </fieldset>
 
-      <button class="send" type="submit">產生郵件寄給我們 ✉</button>
-      <p class="hint">按下後會開啟你的郵件 App，內容已幫你填好，確認後送出即可。我們通常在 2~3 個工作天內回覆。</p>
+      <fieldset>
+        <legend>想告訴我們的內容<span class="req"> *</span></legend>
+        <textarea name="內容" id="msg" required placeholder="請描述遇到的狀況或建議。若是問題回報，寫下操作步驟會很有幫助。"></textarea>
+      </fieldset>
+
+      <button class="send" type="submit">送出反饋</button>
+      <p class="hint">送出後我們會直接收到你的反饋，並回覆到你填寫的 Email，通常在 2～3 個工作天內。</p>
     </form>
 
     <div class="alt">
-      郵件打不開？直接寫信到
+      也可以直接寫信到
       <a href="mailto:yayamingli.app@gmail.com">yayamingli.app@gmail.com</a>，
       或透過 <a href="https://lin.ee/oSstUCa" target="_blank" rel="noopener">LINE 官方帳號</a> 傳訊息給我們。
     </div>
@@ -162,29 +184,30 @@
 <script>
 var fb = document.getElementById('fb');
 
-Array.prototype.forEach.call(fb.platform, function (r) {
+// 平台切換時更新提示文字
+Array.prototype.forEach.call(fb.elements['手機'], function (r) {
   r.addEventListener('change', function () {
-    var ios = fb.platform.value === 'iPhone';
+    var ios = fb.elements['手機'].value === 'iPhone';
     document.getElementById('device').placeholder = ios ? '例如 iPhone 15' : '例如 Pixel 8、Galaxy S24';
     document.getElementById('osver').placeholder = ios ? '例如 iOS 26' : '例如 Android 15';
   });
 });
 
-fb.addEventListener('submit', function (e) {
-  e.preventDefault();
-  var f = e.target;
-  var app = f.app.value, kind = f.kind.value, platform = f.platform.value;
-  var msg = document.getElementById('msg').value.trim();
-  var device = document.getElementById('device').value.trim();
-  var osver = document.getElementById('osver').value.trim();
-  var subject = '[' + app + '] ' + kind;
-  var body = 'App:' + app + '\n類型：' + kind + '\n\n' +
-    (msg || '（請在此描述）') +
-    '\n\n——\n手機：' + platform +
-    '\n裝置型號：' + device + '\n系統版本：' + osver + '\nApp 版本：';
-  location.href = 'mailto:yayamingli.app@gmail.com?subject=' +
-    encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+// 送出前把主旨組成 [App] 類型
+fb.addEventListener('submit', function () {
+  document.getElementById('subj').value =
+    '[' + fb.elements['App'].value + '] ' + fb.elements['類型'].value;
 });
+
+// 本機測試時，_next 改回目前網址
+if (location.hostname === 'localhost' || location.protocol === 'file:') {
+  document.getElementById('nextUrl').value = location.href.split('?')[0] + '?sent=1';
+}
+
+// 送出成功返回時顯示感謝訊息
+if (new URLSearchParams(location.search).get('sent') === '1') {
+  document.getElementById('okBanner').classList.add('show');
+}
 </script>
 </body>
 </html>
