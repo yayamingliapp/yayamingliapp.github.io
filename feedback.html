@@ -96,6 +96,13 @@
   footer{margin-top:3rem; padding-top:1.4rem; border-top:1px solid var(--line);
     color:var(--ink-2); font-size:.85rem; display:flex; gap:1.2rem; flex-wrap:wrap}
   footer a{color:var(--ink-2)}
+  .toast{
+    position:fixed; left:50%; bottom:1.4rem; transform:translateX(-50%) translateY(1rem);
+    background:var(--seal); color:var(--paper); padding:.7rem 1.2rem; border-radius:999px;
+    font-size:.92rem; box-shadow:0 8px 24px rgba(60,45,25,.25);
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:50;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
@@ -181,8 +188,18 @@
   </footer>
 </div>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script>
 var fb = document.getElementById('fb');
+var toastEl = document.getElementById('toast'), toastTimer;
+
+function toast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 3200);
+}
 
 // 平台切換時更新提示文字
 Array.prototype.forEach.call(fb.elements['手機'], function (r) {
@@ -193,21 +210,49 @@ Array.prototype.forEach.call(fb.elements['手機'], function (r) {
   });
 });
 
-// 送出前把主旨組成 [App] 類型
-fb.addEventListener('submit', function () {
-  document.getElementById('subj').value =
-    '[' + fb.elements['App'].value + '] ' + fb.elements['類型'].value;
-});
-
-// 本機測試時，_next 改回目前網址
+// 本機測試時將 _next 改回目前網址
 if (location.hostname === 'localhost' || location.protocol === 'file:') {
   document.getElementById('nextUrl').value = location.href.split('?')[0] + '?sent=1';
 }
 
-// 送出成功返回時顯示感謝訊息
+// AJAX 失敗退回原生提交並導回 ?sent=1 時顯示感謝訊息
 if (new URLSearchParams(location.search).get('sent') === '1') {
   document.getElementById('okBanner').classList.add('show');
+  toast('已收到你的反饋，謝謝！');
+  history.replaceState(null, '', location.pathname);
 }
+
+fb.addEventListener('submit', function (e) {
+  // 蜜罐有值代表機器人 靜默不送
+  var honey = fb.querySelector('input[name="_honey"]');
+  if (honey && honey.value) { e.preventDefault(); return; }
+  if (!fb.reportValidity()) return; // 交給瀏覽器原生必填提示
+
+  document.getElementById('subj').value =
+    '[' + fb.elements['App'].value + '] ' + fb.elements['類型'].value;
+
+  e.preventDefault();
+  var btn = fb.querySelector('button[type="submit"]');
+  btn.disabled = true; btn.style.opacity = '.6';
+
+  fetch('https://formsubmit.co/ajax/yayamingli.app@gmail.com', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json' },
+    body: new FormData(fb)
+  })
+  .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+  .then(function () {
+    fb.reset();
+    document.getElementById('okBanner').classList.add('show');
+    toast('已收到你的反饋，謝謝！');
+    btn.disabled = false; btn.style.opacity = '';
+  })
+  .catch(function () {
+    // AJAX 失敗時退回原生提交 會導向 _next
+    btn.disabled = false; btn.style.opacity = '';
+    fb.submit();
+  });
+});
 </script>
 </body>
 </html>
